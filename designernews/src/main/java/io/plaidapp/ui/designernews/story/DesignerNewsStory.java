@@ -75,7 +75,7 @@ import in.uncod.android.bypass.Bypass;
 import io.plaidapp.core.data.Result;
 import io.plaidapp.core.designernews.DesignerNewsPrefs;
 import io.plaidapp.core.designernews.Injection;
-import io.plaidapp.core.designernews.data.api.comments.DesignerNewsCommentsRepository;
+import io.plaidapp.core.designernews.data.comments.DesignerNewsCommentsRepository;
 import io.plaidapp.core.designernews.data.api.model.Comment;
 import io.plaidapp.core.designernews.data.api.model.Story;
 import io.plaidapp.core.designernews.data.api.model.User;
@@ -869,9 +869,9 @@ public class DesignerNewsStory extends Activity {
                 comment.getUserDisplayName();
                 holder.getAuthor().setText(comment.getUserDisplayName().toLowerCase());
                 holder.getAuthor().setOriginalPoster(isOP(comment.getUserId()));
-                comment.getCreated_at();
+                comment.getCreatedAt();
                 holder.getTimeAgo().setText(
-                        DateUtils.getRelativeTimeSpanString(comment.getCreated_at().getTime(),
+                        DateUtils.getRelativeTimeSpanString(comment.getCreatedAt().getTime(),
                                 System.currentTimeMillis(),
                                 DateUtils.SECOND_IN_MILLIS)
                                 .toString().toLowerCase());
