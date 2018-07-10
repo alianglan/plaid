@@ -75,11 +75,11 @@ import in.uncod.android.bypass.Bypass;
 import io.plaidapp.core.data.Result;
 import io.plaidapp.core.designernews.DesignerNewsPrefs;
 import io.plaidapp.core.designernews.Injection;
-import io.plaidapp.core.designernews.data.comments.DesignerNewsCommentsRepository;
 import io.plaidapp.core.designernews.data.api.model.Comment;
 import io.plaidapp.core.designernews.data.api.model.Story;
 import io.plaidapp.core.designernews.data.api.model.User;
 import io.plaidapp.core.designernews.data.api.votes.DesignerNewsVotesRepository;
+import io.plaidapp.core.designernews.domain.CommentsUseCase;
 import io.plaidapp.core.ui.transitions.GravityArcMotion;
 import io.plaidapp.core.ui.transitions.MorphTransform;
 import io.plaidapp.core.ui.transitions.ReflowText;
@@ -129,7 +129,7 @@ public class DesignerNewsStory extends Activity {
 
     private Story story;
 
-    private DesignerNewsCommentsRepository commentsRepository;
+    private CommentsUseCase commentsUseCase;
     private DesignerNewsVotesRepository votesRepository;
 
     private DesignerNewsPrefs designerNewsPrefs;
@@ -141,14 +141,14 @@ public class DesignerNewsStory extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_designer_news_story);
 
-        commentsRepository = Injection.provideDesignerNewsCommentsRepository(this);
+        commentsUseCase = Injection.provideCommentsUseCase(this);
         votesRepository = Injection.provideDesignerNewsVotesRepository(this);
 
         bindResources();
 
         story = getIntent().getParcelableExtra(Activities.DesignerNews.Story.EXTRA_STORY);
 
-        commentsRepository.getComments(story.getLinks().getComments(),
+        commentsUseCase.getComments(story.getLinks().getComments(),
                 result -> {
                     if (result instanceof Result.Success) {
                         Result.Success<List<Comment>> success =
@@ -943,12 +943,12 @@ public class DesignerNewsStory extends Activity {
                     comment.setUpvoted(true);
                     // TODO fix this
 //                    comment.setVoteCount(comment.getVoteCount() + 1);
-                    holder.getCommentVotes().setText(String.valueOf(comment.getVoteCount()));
+                    holder.getCommentVotes().setText(String.valueOf(comment.getUpvotesCount()));
                     holder.getCommentVotes().setActivated(true);
                 } else {
                     comment.setUpvoted(false);
 //                    comment.setVoteCount(comment.getVoteCount() - 1);
-                    holder.getCommentVotes().setText(String.valueOf(comment.getVoteCount()));
+                    holder.getCommentVotes().setText(String.valueOf(comment.getUpvotesCount()));
                     holder.getCommentVotes().setActivated(false);
                     // TODO actually delete upvote - florina: why?
                 }
