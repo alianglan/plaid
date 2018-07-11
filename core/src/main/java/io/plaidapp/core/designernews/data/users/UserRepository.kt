@@ -17,14 +17,13 @@
 package io.plaidapp.core.designernews.data.users
 
 import io.plaidapp.core.data.Result
-import io.plaidapp.core.designernews.data.api.DesignerNewsService
 import io.plaidapp.core.designernews.data.api.model.User
 import java.io.IOException
 
 /**
- * Class that requests users from the service and caches them, in memory.
+ * Class that requests users from the remote data source and caches them, in memory.
  */
-class UserRepository(private val service: DesignerNewsService) {
+class UserRepository(private val dataSource: UserRemoteDataSource) {
 
     private val cachedUsers = mutableMapOf<Long, User>()
 
@@ -44,8 +43,7 @@ class UserRepository(private val service: DesignerNewsService) {
     }
 
     private suspend fun UserRepository.getAndCacheUsers(userIds: List<Long>) {
-        val requestIds = userIds.joinToString(",")
-        val result = getUsersFromRemote(requestIds)
+        val result = dataSource.getUsers(userIds)
 
         // save the new users in the cachedUsers
         if (result is Result.Success) {
@@ -53,22 +51,13 @@ class UserRepository(private val service: DesignerNewsService) {
         }
     }
 
-    private suspend fun getUsersFromRemote(ids: String): Result<List<User>> {
-        val response = service.getUsers(ids).await()
-        return if (response.isSuccessful && response.body() != null) {
-            Result.Success(response.body().orEmpty())
-        } else {
-            Result.Error(IOException("Error getting users ${response.code()} ${response.message()}"))
-        }
-    }
-
     companion object {
         @Volatile
         private var INSTANCE: UserRepository? = null
 
-        fun getInstance(service: DesignerNewsService): UserRepository {
+        fun getInstance(dataSource: UserRemoteDataSource): UserRepository {
             return INSTANCE ?: synchronized(this) {
-                INSTANCE ?: UserRepository(service).also { INSTANCE = it }
+                INSTANCE ?: UserRepository(dataSource).also { INSTANCE = it }
             }
         }
     }

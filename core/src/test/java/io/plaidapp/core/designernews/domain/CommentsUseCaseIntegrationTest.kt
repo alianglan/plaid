@@ -34,6 +34,7 @@ import io.plaidapp.core.designernews.data.api.user1
 import io.plaidapp.core.designernews.data.api.user2
 import io.plaidapp.core.designernews.data.comments.CommentsRepository
 import io.plaidapp.core.designernews.data.comments.DesignerNewsCommentsRemoteDataSource
+import io.plaidapp.core.designernews.data.users.UserRemoteDataSource
 import io.plaidapp.core.designernews.data.users.UserRepository
 import io.plaidapp.core.designernews.provideCommentsUseCase
 import io.plaidapp.core.designernews.provideCommentsWithRepliesUseCase
@@ -54,7 +55,7 @@ class CommentsUseCaseIntegrationTest {
     private val service = Mockito.mock(DesignerNewsService::class.java)
     private val dataSource = DesignerNewsCommentsRemoteDataSource(service)
     private val commentsRepository = CommentsRepository(dataSource)
-    private val userRepository = UserRepository(service)
+    private val userRepository = UserRepository(UserRemoteDataSource(service))
     private val repository = provideCommentsUseCase(
             provideCommentsWithRepliesUseCase(commentsRepository),
             userRepository,
